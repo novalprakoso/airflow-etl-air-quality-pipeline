@@ -111,7 +111,7 @@ astro dev start
 http://localhost:8080
 ```
 
-(or port shown in Astro CLI)
+(or port shown in Astro CLI -> docker ps)
 
 ---
 
