@@ -1,45 +1,175 @@
-Overview
-========
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+## 📌 Overview
 
-Project Contents
-================
+This project demonstrates an end-to-end **ETL (Extract, Transform, Load) pipeline** built using Apache Airflow.
+The pipeline processes air quality data from a CSV dataset, transforms it using Pandas, and loads it into a MySQL database.
 
-Your Astro project contains the following files and folders:
+This project reflects real-world Data Engineering practices including:
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+* Workflow orchestration
+* Containerized environment
+* Data transformation
+* Database integration
 
-Deploy Your Project Locally
-===========================
+---
 
-Start Airflow on your local machine by running 'astro dev start'.
+## 🛠️ Tech Stack
 
-This command will spin up five Docker containers on your machine, each for a different Airflow component:
+* **Apache Airflow** – Workflow orchestration
+* **Docker** – Containerized environment
+* **Astro CLI** – Airflow project management
+* **MySQL (XAMPP)** – Data storage
+* **Python (Pandas)** – Data processing
 
-- Postgres: Airflow's Metadata Database
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- DAG Processor: The Airflow component responsible for parsing DAGs
-- API Server: The Airflow component responsible for serving the Airflow UI and API
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+---
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+## 📂 Project Structure
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+```
+airflow-etl-air-quality/
+│
+├── dags/
+│   └── airflow_mysql.py        # Main DAG (ETL pipeline)
+│
+├── data/
+│   └── air_quality_dataset.csv # Source dataset
+│
+├── Dockerfile
+├── requirements.txt
+└── README.md
+```
 
-Deploy Your Project to Astronomer
-=================================
+---
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+## ⚙️ ETL Pipeline Flow
 
-Contact
-=======
+### 1. Extract
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+* Read air quality dataset from CSV file
+
+### 2. Transform
+
+* Clean column names
+* Convert data types (datetime, numeric)
+* Handle serialization for Airflow (XCom compatibility)
+
+### 3. Load
+
+* Insert transformed data into MySQL database
+
+---
+
+## 🔄 Workflow (DAG)
+
+```
+create_table_mysql
+        ↓
+extract_transform_task
+        ↓
+load_to_mysql_task
+```
+
+---
+
+## 🧠 Key Challenges & Solutions
+
+### ❗ Issue: MySQL Connection from Docker
+
+* **Problem:** Airflow container couldn’t connect to local MySQL
+* **Solution:** Use `host.docker.internal` as host
+
+---
+
+### ❗ Issue: XCom Serialization Error
+
+* **Problem:** Pandas `Timestamp` not JSON serializable
+* **Solution:** Convert datetime to string before pushing to XCom
+
+---
+
+### ❗ Issue: MySQL Authentication Error
+
+* **Problem:** Password mismatch in Airflow connection
+* **Solution:** Recreate connection with correct credentials
+
+---
+
+## ▶️ How to Run
+
+### 1. Start Airflow
+
+```
+astro dev start
+```
+
+---
+
+### 2. Access Airflow UI
+
+```
+http://localhost:8080
+```
+
+(or port shown in Astro CLI -> docker ps)
+
+---
+
+### 3. Configure Connection
+
+* Go to: Admin → Connections
+* Add MySQL connection:
+
+  * Host: `host.docker.internal`
+  * Login: `root`
+  * Password: *(empty if using XAMPP default)*
+  * Port: `3306`
+
+---
+
+### 4. Trigger DAG
+
+* Open DAG: `etl_air_quality_to_mysql`
+* Click **Trigger**
+
+---
+
+## 📊 Output
+
+* Data successfully stored in MySQL table:
+
+```
+airflow_project.air_quality_data
+```
+
+---
+
+## 🚀 Future Improvements
+
+* Replace CSV with real-time API ingestion
+* Add data validation layer
+* Implement scheduling (daily ingestion)
+* Integrate with data warehouse (BigQuery / Snowflake)
+* Build dashboard visualization (Power BI / Looker Studio)
+
+---
+
+## 👨‍💻 Author
+
+**Noval Prakoso**
+Electrical Engineering Graduate | Aspiring Data Engineer
+
+---
+
+## 💡 Why This Project Matters
+
+This project demonstrates:
+
+* Practical understanding of ETL pipelines
+* Hands-on experience with Airflow orchestration
+* Ability to debug real-world data engineering issues
+* Experience working with Docker-based environments
+
+---
+
+⭐ If you find this project useful, feel free to give it a star!
+>>>>>>> bea34afa2f3098370fc53eef23e0da660c632a61
