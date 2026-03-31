@@ -91,7 +91,6 @@ def load_to_mysql(**context):
 
     # Get connection from Airflow
     conn = BaseHook.get_connection('mysql-local')
-    print("PASSWORD:", conn.password)
     connection = mysql.connector.connect(
         host=conn.host,
         user=conn.login,
