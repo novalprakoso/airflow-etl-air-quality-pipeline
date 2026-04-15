@@ -1,96 +1,141 @@
+# 🌍 Air Quality ETL Pipeline + Dashboard
+
+<div align="center">
+
+End-to-End Data Engineering Project (ETL + BI)  
+Built with Apache Airflow, MySQL, and Power BI  
+
+</div>
+
+---
 
 ## 📌 Overview
 
-This project demonstrates an end-to-end **ETL (Extract, Transform, Load) pipeline** built using Apache Airflow.
-The pipeline processes air quality data from a CSV dataset, transforms it using Pandas, and loads it into a MySQL database.
+This project demonstrates an end-to-end **ETL (Extract, Transform, Load) pipeline** combined with **Business Intelligence (BI) dashboarding**.
 
-This project reflects real-world Data Engineering practices including:
+The pipeline processes historical **Air Quality data (2018–2025)** from a CSV dataset, transforms it using Pandas, loads it into a MySQL database, and visualizes insights through an interactive Power BI dashboard.
 
-* Workflow orchestration
-* Containerized environment
-* Data transformation
-* Database integration
+💡 This project simulates a real-world **Data Engineering workflow**:
+- Data ingestion (CSV)
+- Data cleaning & transformation
+- Workflow orchestration (Airflow)
+- Data storage (MySQL)
+- Data visualization (Power BI)
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Apache Airflow** – Workflow orchestration
-* **Docker** – Containerized environment
-* **Astro CLI** – Airflow project management
-* **MySQL (XAMPP)** – Data storage
-* **Python (Pandas)** – Data processing
+| Layer              | Tools Used |
+|------------------|-----------|
+| Orchestration     | Apache Airflow |
+| Environment       | Docker + Astro CLI |
+| Processing        | Python (Pandas) |
+| Storage           | MySQL (XAMPP) |
+| Visualization     | Power BI |
 
 ---
 
 ## 📂 Project Structure
-
-```
 airflow-etl-air-quality/
 │
 ├── dags/
-│   └── airflow_mysql.py        # Main DAG (ETL pipeline)
+│ ├── airflow_mysql.py # ETL pipeline (CSV → MySQL)
+│ └── etl_air_quality_api.py # (Optional) API-based pipeline
 │
 ├── data/
-│   └── air_quality_dataset.csv # Source dataset
+│ └── air_quality_dataset.csv # Historical dataset (2018–2025)
+│
+├── dashboard/
+│ └── Dashboard Air Quality Dataset.pbix # Power BI Dashboard
 │
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
-```
+
 
 ---
 
 ## ⚙️ ETL Pipeline Flow
 
 ### 1. Extract
-
 * Read air quality dataset from CSV file
 
 ### 2. Transform
-
-* Clean column names
-* Convert data types (datetime, numeric)
-* Handle serialization for Airflow (XCom compatibility)
+* Clean and standardize data
+* Handle missing values
+* Convert datetime format
+* Ensure compatibility with Airflow XCom
 
 ### 3. Load
-
-* Insert transformed data into MySQL database
+* Insert processed data into MySQL table
 
 ---
 
-## 🔄 Workflow (DAG)
+## 🔄 Workflow (Airflow DAG)
 
-```
+
 create_table_mysql
-        ↓
+↓
 extract_transform_task
-        ↓
+↓
 load_to_mysql_task
-```
+
+
+---
+
+## 📊 Power BI Dashboard
+
+This project includes a fully interactive Power BI dashboard for data exploration and insights.
+
+### 🔍 Key Metrics
+
+* Avg AQI: **84.03**
+* Max AQI: **125.08**
+* Avg PM2.5: **80.26**
+* Avg Wind Speed: **4.23**
+
+### 📈 Visualizations
+
+* AQI Category Distribution (Good, Moderate, Unhealthy)
+* Air Pollution Trends (PM2.5, PM10, NO2)
+* Yearly Comparison Analysis
+* Monthly Pollution Patterns
+* Worst AQI Days Ranking
+
+### 💡 Key Insights
+
+* 📉 Best Air Quality Year: **2019**
+* ⚠️ Worst Air Quality Year: **2020**
+* 🔥 Highest AQI recorded: **125+**
+* 📅 Worst Day: **14 April 2023**
+<img width="967" height="546" alt="image" src="https://github.com/user-attachments/assets/f25da2bf-2d42-478f-a85a-df940660daf0" />
 
 ---
 
 ## 🧠 Key Challenges & Solutions
 
-### ❗ Issue: MySQL Connection from Docker
-
-* **Problem:** Airflow container couldn’t connect to local MySQL
+### ❗ MySQL Connection from Docker
+* **Problem:** Airflow container couldn’t connect to local MySQL  
 * **Solution:** Use `host.docker.internal` as host
 
 ---
 
-### ❗ Issue: XCom Serialization Error
-
-* **Problem:** Pandas `Timestamp` not JSON serializable
+### ❗ XCom Serialization Error
+* **Problem:** Pandas `Timestamp` not JSON serializable  
 * **Solution:** Convert datetime to string before pushing to XCom
 
 ---
 
-### ❗ Issue: MySQL Authentication Error
+### ❗ Airflow DAG Not Detected
+* **Problem:** DAG file not appearing in Airflow UI  
+* **Solution:** Ensure correct `dags/` mounting inside Docker container
 
-* **Problem:** Password mismatch in Airflow connection
-* **Solution:** Recreate connection with correct credentials
+---
+
+### ❗ API Limitation (OpenAQ)
+* **Problem:** API requires authentication / deprecated endpoints  
+* **Solution:** Use alternative dataset (CSV) for stable pipeline
 
 ---
 
@@ -98,31 +143,32 @@ load_to_mysql_task
 
 ### 1. Start Airflow
 
-```
+
 astro dev start
-```
+
 
 ---
 
 ### 2. Access Airflow UI
 
-```
-http://localhost:8080
-```
 
-(or port shown in Astro CLI -> docker ps)
+http://localhost:8080
+
+
+(or check port via `docker ps`)
 
 ---
 
-### 3. Configure Connection
+### 3. Configure MySQL Connection
 
-* Go to: Admin → Connections
-* Add MySQL connection:
+Go to: **Admin → Connections**
 
-  * Host: `host.docker.internal`
-  * Login: `root`
-  * Password: *(empty if using XAMPP default)*
-  * Port: `3306`
+| Field    | Value                    |
+|----------|--------------------------|
+| Host     | host.docker.internal     |
+| Login    | root                     |
+| Password | (empty if XAMPP default) |
+| Port     | 3306                     |
 
 ---
 
@@ -131,31 +177,37 @@ http://localhost:8080
 * Open DAG: `etl_air_quality_to_mysql`
 * Click **Trigger**
 
+<img width="959" height="409" alt="Tampilan Airflow ETL Success" src="https://github.com/user-attachments/assets/094fd8f6-30a4-4950-9ab9-bec9d90af24a" />
+
 ---
 
 ## 📊 Output
 
-* Data successfully stored in MySQL table:
+Data is stored in MySQL table:
 
-```
+
 airflow_project.air_quality_data
-```
+
+<img width="959" height="410" alt="Tampilan SQL - Data Berhasil Load" src="https://github.com/user-attachments/assets/bc9980ad-6a70-4c18-8ade-49049ac2f72d" />
+
+This data is then connected to **Power BI** for visualization.
 
 ---
 
 ## 🚀 Future Improvements
 
-* Replace CSV with real-time API ingestion
-* Add data validation layer
-* Implement scheduling (daily ingestion)
-* Integrate with data warehouse (BigQuery / Snowflake)
-* Build dashboard visualization (Power BI / Looker Studio)
+* Implement **incremental loading (daily ingestion)**
+* Replace CSV with **real-time API pipeline**
+* Add **data validation layer (Great Expectations)**
+* Store data in **Data Warehouse (BigQuery / Snowflake)**
+* Automate dashboard refresh
+* Add **data lineage & monitoring**
 
 ---
 
 ## 👨‍💻 Author
 
-**Noval Prakoso**
+**Noval Prakoso**  
 Electrical Engineering Graduate | Aspiring Data Engineer
 
 ---
@@ -164,12 +216,12 @@ Electrical Engineering Graduate | Aspiring Data Engineer
 
 This project demonstrates:
 
-* Practical understanding of ETL pipelines
-* Hands-on experience with Airflow orchestration
-* Ability to debug real-world data engineering issues
-* Experience working with Docker-based environments
+* End-to-end **Data Engineering workflow**
+* Real-world **ETL pipeline implementation**
+* Hands-on experience with **Airflow & Docker**
+* Ability to handle **data quality & pipeline issues**
+* Integration with **Business Intelligence tools**
 
 ---
 
 ⭐ If you find this project useful, feel free to give it a star!
->>>>>>> bea34afa2f3098370fc53eef23e0da660c632a61
