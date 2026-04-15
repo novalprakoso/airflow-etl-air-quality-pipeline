@@ -36,26 +36,6 @@ The pipeline processes historical **Air Quality data (2018–2025)** from a CSV 
 
 ---
 
-## 📂 Project Structure
-airflow-etl-air-quality/
-│
-├── dags/
-│ ├── airflow_mysql.py # ETL pipeline (CSV → MySQL)
-│ └── etl_air_quality_api.py # (Optional) API-based pipeline
-│
-├── data/
-│ └── air_quality_dataset.csv # Historical dataset (2018–2025)
-│
-├── dashboard/
-│ └── Dashboard Air Quality Dataset.pbix # Power BI Dashboard
-│
-├── Dockerfile
-├── requirements.txt
-└── README.md
-
-
----
-
 ## ⚙️ ETL Pipeline Flow
 
 ### 1. Extract
